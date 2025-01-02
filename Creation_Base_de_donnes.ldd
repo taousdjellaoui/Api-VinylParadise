@@ -1,0 +1,96 @@
+CREATE DATABASE IF NOT EXISTS tonNom_api_VinylParadise;
+
+USE tonNom_api_VinylParadise;
+
+ALTER DATABASE tonNom_api_VinylParadise
+  DEFAULT CHARACTER SET utf8
+  DEFAULT COLLATE utf8_general_ci;
+
+-- Create `artiste` table
+CREATE TABLE artiste (
+    id INT AUTO_INCREMENT,
+    nom VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- Create `utilisateur` table
+CREATE TABLE utilisateur (
+    email VARCHAR(255) NOT NULL,
+    nom VARCHAR(255) NOT NULL,
+    prénom VARCHAR(255) NOT NULL,
+    PRIMARY KEY (email)
+);
+
+-- Create `genre` table
+CREATE TABLE genre (
+    id INT AUTO_INCREMENT,
+    nom VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- Create `albums` table with cascading deletes/updates for `artiste`
+CREATE TABLE albums (
+    id INT AUTO_INCREMENT,
+    titre VARCHAR(255) NOT NULL,
+    date_sortie DATE,
+    artist_id INT NOT NULL,
+    url_image VARCHAR(255),
+    PRIMARY KEY (id),
+    FOREIGN KEY (artist_id) REFERENCES artiste(id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create join table `albums_genre` for many-to-many relationship
+CREATE TABLE albums_genre (
+    albums_id INT NOT NULL,
+    genre_id INT NOT NULL,
+    PRIMARY KEY (albums_id, genre_id),
+    FOREIGN KEY (albums_id) REFERENCES albums(id)
+      ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (genre_id) REFERENCES genre(id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create `vinyles` table with cascading deletes/updates for `utilisateur` and `albums`
+CREATE TABLE vinyles (
+    id INT AUTO_INCREMENT,
+    utilisateur_email VARCHAR(255) NOT NULL,
+    album_id INT NOT NULL,
+    prix INT NOT NULL,
+    description TEXT,
+    PRIMARY KEY (id),
+    FOREIGN KEY (utilisateur_email) REFERENCES utilisateur(email)
+      ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (album_id) REFERENCES albums(id)
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+
+DELIMITER //
+CREATE TRIGGER before_album_insert
+BEFORE INSERT ON albums
+FOR EACH ROW
+BEGIN
+    DECLARE artistExists INT;
+    SELECT COUNT(*) INTO artistExists FROM artiste WHERE id = NEW.artist_id;
+    IF artistExists = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Artist ID does not exist. Insert the artist first.';
+    END IF;
+END;
+//
+
+CREATE TRIGGER before_vinyle_insert
+BEFORE INSERT ON vinyles
+FOR EACH ROW
+BEGIN
+    DECLARE userExists INT;
+    SELECT COUNT(*) INTO userExists FROM utilisateur WHERE email = NEW.utilisateur_email;
+    IF userExists = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User email does not exist. Insert the user first.';
+    END IF;
+END;
+//
+DELIMITER ;
