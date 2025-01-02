@@ -1,0 +1,276 @@
+{
+	"info": {
+		"_postman_id": "fda643e6-0003-4eef-812a-7859502c84ab",
+		"name": "Collection Genre",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37982647",
+		"_collection_link": "https://service-dechange.postman.co/workspace/API-VinylParadise~423efa48-05b8-418e-909c-8f65f840a58f/collection/37982647-fda643e6-0003-4eef-812a-7859502c84ab?action=share&source=collection_link&creator=37982647"
+	},
+	"item": [
+		{
+			"name": "Étant donné que des genres existent, lorsque je récupère tous les genres, alors je reçois la liste des genres",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(pm.response.json()).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{adresse API}}/genres",
+					"host": [
+						"{{adresse API}}"
+					],
+					"path": [
+						"genres"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Étant donné que le genre avec l'ID 1 existe, lorsque je récupère ce genre, alors je reçois ses informations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response contains genre details\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData).to.have.property('nom');",
+							"    pm.expect(jsonData).to.have.property('description');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{adresse API}}/genres/1",
+					"host": [
+						"{{adresse API}}"
+					],
+					"path": [
+						"genres",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Étant donné qu'un genre nommé 'Jazz' existe, lorsque je recherche les genres par nom 'Jazz', alors je reçois tous les genres correspondants",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response contains matching genres\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"    pm.expect(jsonData[0].nom).to.equal('Jazz');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{adresse API}}/genres/recherche?nom=Jazz",
+					"host": [
+						"{{adresse API}}"
+					],
+					"path": [
+						"genres",
+						"recherche"
+					],
+					"query": [
+						{
+							"key": "nom",
+							"value": "Jazz"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Étant donné que je souhaite ajouter un genre, lorsque je fournis les données du genre, alors ce genre est créé",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"pm.test(\"Response contains new genre details\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData.nom).to.equal('Jazz');",
+							"    pm.expect(jsonData.description).to.equal('A genre of music characterized by swing and blue notes.');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nom\": \"Jazz\",\n  \"description\": \"A genre of music characterized by swing and blue notes.\"\n}"
+				},
+				"url": {
+					"raw": "{{adresse API}}/genres",
+					"host": [
+						"{{adresse API}}"
+					],
+					"path": [
+						"genres"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Étant donné que le genre avec l'ID 1 existe, lorsque je mets à jour ce genre, alors les nouvelles informations sont enregistrées",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response contains updated genre details\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.nom).to.equal('Jazz');",
+							"    pm.expect(jsonData.description).to.equal('An updated description for the Jazz genre.');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nom\": \"Jazz\",\n  \"description\": \"An updated description for the Jazz genre.\"\n}"
+				},
+				"url": {
+					"raw": "{{adresse API}}/genres/1",
+					"host": [
+						"{{adresse API}}"
+					],
+					"path": [
+						"genres",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Étant donné que le genre avec l'ID 1 existe, lorsque je le supprime, alors il n'est plus disponible",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"pm.test(\"Response body is empty\", function () {",
+							"    pm.expect(pm.response.text()).to.equal('');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{adresse API}}/genres/1",
+					"host": [
+						"{{adresse API}}"
+					],
+					"path": [
+						"genres",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "adresse API",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
